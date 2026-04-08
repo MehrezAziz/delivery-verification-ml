@@ -11,7 +11,7 @@ from fastapi import Depends, FastAPI
 from verification_ml import __version__
 from verification_ml.auth import verify_bearer
 from verification_ml.config import settings
-from verification_ml.face_engine import compare_document_selfie
+from verification_ml.face_engine import analyze_liveness_frame, compare_document_selfie
 from verification_ml.ocr_engine import run_ocr_on_bgr
 from verification_ml.preprocess import preprocess_for_ocr
 from verification_ml.schemas import (
@@ -22,6 +22,8 @@ from verification_ml.schemas import (
     HealthResponse,
     OcrRequest,
     OcrResponse,
+    LivenessFrameRequest,
+    LivenessFrameResponse,
 )
 
 
@@ -63,6 +65,12 @@ async def face_endpoint(body: FaceRequest):
     return FaceResponse(similarity=sim)
 
 
+@app.post("/liveness/frame", response_model=LivenessFrameResponse, dependencies=[Depends(verify_bearer)])
+async def liveness_frame_endpoint(body: LivenessFrameRequest):
+    payload = analyze_liveness_frame(body.action, body.imageBase64)
+    return LivenessFrameResponse(**payload)
+
+
 @app.post("/v1/forgery", response_model=ForgeryResponse, dependencies=[Depends(verify_bearer)])
 async def forgery_stub(_body: ForgeryRequest):
     """Placeholder for future JPEG resaving / noise heuristics."""
@@ -79,6 +87,6 @@ async def root():
         "service": "delivery-verification-ml",
         "version": __version__,
         "docs": "/docs",
-        "endpoints": ["/health", "/ocr", "/face", "/v1/forgery"],
+        "endpoints": ["/health", "/ocr", "/face", "/liveness/frame", "/v1/forgery"],
         "auth": "optional Bearer token if API_KEY is set",
     }

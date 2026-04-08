@@ -23,6 +23,20 @@ class FaceResponse(BaseModel):
     similarity: float = Field(..., ge=0.0, le=1.0)
 
 
+class LivenessFrameRequest(BaseModel):
+    action: str
+    imageBase64: str
+
+
+class LivenessFrameResponse(BaseModel):
+    matched: bool
+    faceDetected: bool
+    yaw: float | None = None
+    pitch: float | None = None
+    roll: float | None = None
+    eyesDetected: int | None = None
+
+
 class ForgeryRequest(BaseModel):
     imageBase64: str
 
