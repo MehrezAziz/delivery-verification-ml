@@ -1,0 +1,28 @@
+services:
+  verification-ml:
+    build: .
+    ports:
+      - "${VERIFICATION_ML_PORT:-8000}:8000"
+    environment:
+      API_KEY: ${API_KEY:-}
+      INSIGHTFACE_ROOT: ${INSIGHTFACE_ROOT:-/root/.insightface}
+      INSIGHTFACE_MODEL: ${INSIGHTFACE_MODEL:-buffalo_l}
+      FACE_DET_SIZE: ${FACE_DET_SIZE:-640}
+    volumes:
+      # Persist downloaded InsightFace models between restarts
+      - insightface-cache:/root/.insightface
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 180s
+
+volumes:
+  insightface-cache:
