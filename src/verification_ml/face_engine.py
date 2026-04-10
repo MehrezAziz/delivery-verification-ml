@@ -118,7 +118,8 @@ def analyze_liveness_frame(action: str, image_b64: str) -> dict:
     elif action == "TURN_LEFT":
         matched = yaw >= 9.0
     elif action == "HOLD_HIGH":
-        matched = abs(yaw) <= 14.0 and pitch <= -5.0 and abs(roll) <= 20.0
+        # Frontal / "look at camera": neutral yaw and pitch (aligned with on-device ML Kit checks).
+        matched = abs(yaw) <= 14.0 and abs(pitch) <= 10.0 and abs(roll) <= 20.0
     elif action == "BLINK":
         matched = eyes_detected == 0
 
