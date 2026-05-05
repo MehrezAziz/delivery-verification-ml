@@ -1,8 +1,9 @@
 services:
   verification-ml:
     build: .
+    # Bind to localhost only on the VPS so OCR/face APIs are not exposed publicly (Nest calls via 127.0.0.1).
     ports:
-      - "${VERIFICATION_ML_PORT:-8000}:8000"
+      - "127.0.0.1:${VERIFICATION_ML_PORT:-8000}:8000"
     environment:
       API_KEY: ${API_KEY:-}
       INSIGHTFACE_ROOT: ${INSIGHTFACE_ROOT:-/root/.insightface}
